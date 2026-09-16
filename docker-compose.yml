@@ -1,0 +1,143 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # 1. PostgreSQL Relational Database with Healthcheck & Persistent Volume
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: enterprise_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-appuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-supersecretpassword123!}
+      POSTGRES_DB: ${POSTGRES_DB:-enterprise_db}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-appuser} -d ${POSTGRES_DB:-enterprise_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - enterprise_network
+
+  # ============================================================================
+  # 2. Redis In-Memory Cache, Session Blacklist & Task Broker
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: enterprise_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - enterprise_network
+
+  # ============================================================================
+  # 3. Python FastAPI High-Performance Backend (Async SQLAlchemy 2.0 & Pydantic v2)
+  # ============================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: enterprise_backend
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --workers 1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-appuser}:${POSTGRES_PASSWORD:-supersecretpassword123!}@postgres:5432/${POSTGRES_DB:-enterprise_db}
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-e83a9926c4f03d6d5ef109b83b3e2185481d9f826354b3ad386b0daef4e0a417}
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - enterprise_network
+
+  # ============================================================================
+  # 4. Background Task Worker (Celery / Async Agent Execution Engine)
+  # ============================================================================
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: enterprise_worker
+    restart: unless-stopped
+    command: python -m app.worker
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-appuser}:${POSTGRES_PASSWORD:-supersecretpassword123!}@postgres:5432/${POSTGRES_DB:-enterprise_db}
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-e83a9926c4f03d6d5ef109b83b3e2185481d9f826354b3ad386b0daef4e0a417}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - enterprise_network
+
+  # ============================================================================
+  # 5. Frontend Web Application Container (React/Vite & Nginx Multi-stage)
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: enterprise_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    networks:
+      - enterprise_network
+
+networks:
+  enterprise_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

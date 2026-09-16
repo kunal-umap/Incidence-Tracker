@@ -1,0 +1,6 @@
+{
+  "name": "Enterprise Python Auth & Agent Backend",
+  "description": "Production-grade, scalable Python FastAPI backend architecture with JWT auth, PostgreSQL, Docker, Redis, and AI Agent module.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
