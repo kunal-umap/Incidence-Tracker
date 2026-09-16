@@ -1,6 +1,6 @@
-# Enterprise Python Backend Service
+# Backend Service
 
-A high-performance, industrial-standard Python backend built with **FastAPI**, **SQLAlchemy 2.0 (Async)**, **PostgreSQL 16**, **Redis 7**, **Pydantic v2**, and **Celery**.
+A high-performance Python backend built with **FastAPI**, **SQLAlchemy 2.0 (Async)**, **PostgreSQL 16**, **Redis 7**, **Pydantic v2**, and **Celery**.
 
 ## Architecture Highlights
 - **Layered Clean Architecture**: Strict decoupling between HTTP controllers (`api/`), business domain logic (`services/`), data persistence (`repositories/`), and data definitions (`models/` & `schemas/`).
