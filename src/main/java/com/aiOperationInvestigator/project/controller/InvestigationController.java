@@ -8,6 +8,9 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/api/v1/incidents")
+@CrossOrigin(origins = {
+        "http://localhost:8080"
+})
 public class InvestigationController {
 
     @Autowired

@@ -42,17 +42,19 @@ public class InvestigationService {
                                             is required and the necessary inputs are available.
                                             Do not claim a tool was executed unless it was
                                             actually invoked.
-                        
+
                                             Return ONLY valid JSON in this format:
+
                                             {
-                                              "requiredData": [
+                                              "issue": "",
+                                              "analysis": "",
+                                              "proof": [
                                                 {
-                                                  "data": "",
-                                                  "reason": "",
-                                                  "agent": "",
-                                                  "relatedHypothesis": ""
+                                                  "evidence": "",
+                                                  "source": ""
                                                 }
-                                              ]
+                                              ],
+                                              "suggestion": []
                                             }
                         """)
                 .user(incidentDescription)
