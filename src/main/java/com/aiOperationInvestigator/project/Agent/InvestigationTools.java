@@ -1,7 +1,7 @@
 package com.aiOperationInvestigator.project.Agent;
 
-import lombok.extern.java.Log;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -9,9 +9,12 @@ import java.io.IOException;
 @Component
 public class InvestigationTools {
     private final LogsAnalysisAgent logsAnalysisAgent;
+    private final RagAgent ragAgent;
 
-    public InvestigationTools(LogsAnalysisAgent logsAnalysisAgent){
+    public InvestigationTools(LogsAnalysisAgent logsAnalysisAgent,
+                              RagAgent ragAgent){
         this.logsAnalysisAgent = logsAnalysisAgent;
+        this.ragAgent = ragAgent;
     }
 
     @Tool(description = """
@@ -50,6 +53,18 @@ public class InvestigationTools {
         """)
     public String analyzeDeploymentLogs(String incidentDescription) throws IOException {
         return logsAnalysisAgent.analyzeDeploymentLogs(incidentDescription);
+    }
+
+    @Tool(description = """
+    Generate synthetic historical incidents similar to the provided
+    production incident description for testing purposes.
+    Return each incident's description, date, root cause, and previously
+    implemented solution in valid JSON.
+    Do not retrieve real incidents or claim generated data is factual.
+    """)
+    public String searchPreviousSimilarIncident(@ToolParam(description = "Current production incident description")
+                                                String incidentDescription){
+        return ragAgent.retriveSimilarEVent(incidentDescription);
     }
 
 

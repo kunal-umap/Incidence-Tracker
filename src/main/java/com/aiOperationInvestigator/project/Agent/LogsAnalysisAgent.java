@@ -10,6 +10,7 @@ import java.nio.file.Path;
 public class LogsAnalysisAgent {
 
 
+
     public String analyzeApplicationLogs(String incidentDescription) throws IOException {
         return Files.readString(Path.of("logs/application/application.log"));
     }

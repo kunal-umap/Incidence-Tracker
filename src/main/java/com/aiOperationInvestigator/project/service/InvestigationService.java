@@ -44,6 +44,7 @@ public class InvestigationService {
                                                   - Use `analyzeApplicationLogs` when application errors, exceptions, request failures, timeouts, or API performance require investigation.
                                                   - Use `analyzeDatabaseLogs` when database errors, slow queries, connection-pool issues, lock waits, or query timeouts require investigation.
                                                   - Use `analyzeDeploymentLogs` when recent releases, rollbacks, configuration changes, or deployment events may be relevant.
+                                                  - Use 'searchPreviousSimilarIncident' to get previous similar incidents.
                                                   - Invoke a tool only when it is relevant and the required inputs are available.
                                                   - Pass the incident description and relevant context to each invoked tool.
                                                   - Analyze the actual results returned by the tools before drawing conclusions.
@@ -79,6 +80,14 @@ public class InvestigationService {
                                                  ],
                                                  "suggestion": [
                                                    "Specific next investigation step or recommended action"
+                                                 ],
+                                                 "similarIncidents": [
+                                                     {
+                                                      "incident": "",
+                                                      "date": "",
+                                                      "rootCause": "",
+                                                      "previouslyImplementedSolution": ""
+                                                     }
                                                  ]
                                                }
                         
