@@ -1,0 +1,38 @@
+2026-10-15 10:00:00.112 INFO  [main] c.a.i.AiOperationInvestigatorApplication - Starting AiOperationInvestigatorApplication using Java 21
+2026-10-15 10:00:01.031 INFO  [main] c.a.i.AiOperationInvestigatorApplication - Started AiOperationInvestigatorApplication in 2.84 seconds
+2026-10-15 10:14:21.104 INFO  [http-nio-8080-exec-2] c.a.i.controller.IncidentController - Received investigation request incidentId=INC-1042 correlationId=7f3a91c2
+2026-10-15 10:14:21.598 INFO  [http-nio-8080-exec-2] c.a.i.service.InvestigationService - Starting orchestration incidentId=INC-1042
+2026-10-15 10:14:22.006 INFO  [http-nio-8080-exec-2] c.a.i.tools.InvestigationTools - TOOL CALLED: appLogAgent incidentId=INC-1042 keyword=TimeoutException
+2026-10-15 10:14:22.019 INFO  [http-nio-8080-exec-2] c.a.i.service.LogFileService - Application log search completed incidentId=INC-1042 matches=4 elapsedMs=8
+2026-10-15 10:14:22.023 INFO  [http-nio-8080-exec-2] c.a.i.tools.InvestigationTools - TOOL CALLED: dbLogAgent incidentId=INC-1042 keyword=connection pool
+2026-10-15 10:14:22.040 INFO  [http-nio-8080-exec-2] c.a.i.service.LogFileService - Database log search completed incidentId=INC-1042 matches=3 elapsedMs=9
+2026-10-15 10:14:22.382 INFO  [http-nio-8080-exec-2] c.a.i.service.InvestigationService - Investigation completed incidentId=INC-1042 status=EVIDENCE_COLLECTED durationMs=1261
+2026-10-15 10:15:03.206 INFO  [http-nio-8080-exec-5] c.a.i.controller.OrderController - Incoming request method=GET path=/api/orders/78125 correlationId=9b6c4d10
+2026-10-15 10:15:03.212 INFO  [http-nio-8080-exec-5] c.a.i.service.OrderService - Loading order orderId=78125 correlationId=9b6c4d10
+2026-10-15 10:15:05.724 WARN  [http-nio-8080-exec-5] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Connection acquisition delayed; total=20 active=20 idle=0 waiting=12
+2026-10-15 10:15:06.013 WARN  [http-nio-8080-exec-5] c.a.i.repository.OrderRepository - Slow database operation operation=findOrderById orderId=78125 durationMs=2801 correlationId=9b6c4d10
+2026-10-15 10:15:08.221 ERROR [http-nio-8080-exec-5] c.a.i.service.OrderService - Order lookup failed orderId=78125 correlationId=9b6c4d10
+java.util.concurrent.TimeoutException: Database operation exceeded configured timeout of 5000 ms
+    at com.aiOperationInvestigator.project.service.OrderService.getOrder(OrderService.java:87)
+    at com.aiOperationInvestigator.project.controller.OrderController.getOrder(OrderController.java:52)
+2026-10-15 10:15:08.229 ERROR [http-nio-8080-exec-5] c.a.i.exception.GlobalExceptionHandler - Returning HTTP 500 path=/api/orders/78125 correlationId=9b6c4d10 errorCode=ORDER_LOOKUP_FAILED
+2026-10-15 10:15:08.235 INFO  [http-nio-8080-exec-5] c.a.i.metrics.RequestMetrics - Request completed method=GET path=/api/orders/78125 status=500 durationMs=5029 correlationId=9b6c4d10
+2026-10-15 10:15:09.014 INFO  [http-nio-8080-exec-7] c.a.i.controller.OrderController - Incoming request method=GET path=/api/orders/78126 correlationId=cb20f883
+2026-10-15 10:15:11.526 WARN  [http-nio-8080-exec-7] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Connection acquisition delayed; total=20 active=20 idle=0 waiting=15
+2026-10-15 10:15:14.025 ERROR [http-nio-8080-exec-7] c.a.i.service.OrderService - Order lookup failed orderId=78126 correlationId=cb20f883
+java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not available, request timed out after 5000ms
+    at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:696)
+    at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:197)
+    at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:100)
+2026-10-15 10:15:14.032 ERROR [http-nio-8080-exec-7] c.a.i.exception.GlobalExceptionHandler - Returning HTTP 500 path=/api/orders/78126 correlationId=cb20f883 errorCode=ORDER_LOOKUP_FAILED
+2026-10-15 10:15:14.039 INFO  [http-nio-8080-exec-7] c.a.i.metrics.RequestMetrics - Request completed method=GET path=/api/orders/78126 status=500 durationMs=5025 correlationId=cb20f883
+2026-10-15 10:15:18.442 WARN  [http-nio-8080-exec-3] c.a.i.service.OrderService - Elevated request latency endpoint=/api/orders p95Ms=4200 thresholdMs=1000 windowSeconds=60
+2026-10-15 10:15:20.108 INFO  [scheduling-1] c.a.i.monitoring.HealthMonitor - Health check completed appStatus=UP databaseStatus=DEGRADED
+2026-10-15 10:15:22.773 WARN  [http-nio-8080-exec-8] c.a.i.service.OrderService - Retrying transient database operation attempt=2 maxAttempts=3 correlationId=cb20f883
+2026-10-15 10:15:27.789 ERROR [http-nio-8080-exec-8] c.a.i.service.OrderService - Database retry exhausted operation=findOrderById correlationId=cb20f883
+2026-10-15 10:15:27.795 INFO  [http-nio-8080-exec-8] c.a.i.metrics.RequestMetrics - Request completed method=GET path=/api/orders/78126 status=500 durationMs=13776 correlationId=cb20f883
+2026-10-15 10:17:00.002 INFO  [scheduling-1] c.a.i.monitoring.HealthMonitor - Health check completed appStatus=UP databaseStatus=DEGRADED
+2026-10-15 10:17:30.005 WARN  [scheduling-1] c.a.i.monitoring.HealthMonitor - Database health check latencyMs=2200 thresholdMs=500
+2026-10-15 10:19:15.113 INFO  [http-nio-8080-exec-1] c.a.i.controller.OrderController - Incoming request method=GET path=/api/orders/78127 correlationId=11d7a6ee
+2026-10-15 10:19:20.121 ERROR [http-nio-8080-exec-1] c.a.i.service.OrderService - Request timed out path=/api/orders/78127 timeoutMs=5000 correlationId=11d7a6ee
+2026-10-15 10:19:20.128 INFO  [http-nio-8080-exec-1] c.a.i.metrics.RequestMetrics - Request completed method=GET path=/api/orders/78127 status=504 durationMs=5015 correlationId=11d7a6ee

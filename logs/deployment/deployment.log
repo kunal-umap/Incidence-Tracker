@@ -1,0 +1,5 @@
+2026-10-15 09:45:00 INFO  deployment-service - Deployment started service=orders-service version=2.8.4 environment=production
+2026-10-15 09:46:12 INFO  deployment-service - Container rollout completed service=orders-service version=2.8.4 replicas=4
+2026-10-15 09:47:05 INFO  deployment-service - Health checks passed service=orders-service version=2.8.4
+2026-10-15 10:14:00 WARN  deployment-service - Elevated error rate detected service=orders-service version=2.8.4 error_rate=8.5 percent_window=5m
+2026-10-15 10:16:30 INFO  deployment-service - No additional deployment detected service=orders-service window_start=10:00 window_end=10:16

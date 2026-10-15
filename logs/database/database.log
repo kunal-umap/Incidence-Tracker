@@ -1,0 +1,9 @@
+2026-10-15 10:15:03.300 INFO  [postgres] connection received user=app_user database=orders_db client=10.0.2.15
+2026-10-15 10:15:03.321 LOG   [postgres] duration: 2810.4 ms statement: SELECT * FROM orders WHERE order_id = 78125
+2026-10-15 10:15:05.720 WARN  [postgres] connection usage high active_connections=95 max_connections=100
+2026-10-15 10:15:06.010 WARN  [postgres] slow query duration_ms=3200 query_id=Q-101 operation=findOrderById
+2026-10-15 10:15:08.100 INFO  [postgres] lock wait observed relation=orders wait_ms=1800 pid=21984
+2026-10-15 10:15:09.400 WARN  [postgres] connection count reached configured maximum active_connections=100 max_connections=100
+2026-10-15 10:15:11.500 LOG   [postgres] duration: 5012.8 ms statement: SELECT * FROM orders WHERE order_id = 78126
+2026-10-15 10:15:14.000 WARN  [postgres] statement cancelled due to client timeout pid=21991 query_id=Q-102
+2026-10-15 10:16:00.000 INFO  [postgres] active_connections=82 idle_connections=8 max_connections=100
