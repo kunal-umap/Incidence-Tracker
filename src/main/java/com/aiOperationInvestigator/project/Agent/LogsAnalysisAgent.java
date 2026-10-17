@@ -9,22 +9,16 @@ import java.nio.file.Path;
 @Component
 public class LogsAnalysisAgent {
 
-
-
     public String analyzeApplicationLogs(String incidentDescription) throws IOException {
-        return Files.readString(Path.of("logs/application/application.log"));
+        return Files.readString(Path.of("/app/logs/application/application.log"));
     }
 
     public String analyzeDatabaseLogs(String incidentDescription) throws IOException {
-        return Files.readString(Path.of("logs/database/database.log"));
+        return Files.readString(Path.of("/app/logs/database/database.log"));
     }
 
     public String analyzeDeploymentLogs(String incidentDescription) throws IOException {
-        return Files.readString(Path.of("logs/deployment/deployment.log"));
+        return Files.readString(Path.of("/app/logs/deployment/deployment.log"));
     }
-
-
-
-
 
 }

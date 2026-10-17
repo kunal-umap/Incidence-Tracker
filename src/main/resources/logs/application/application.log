@@ -24,6 +24,11 @@ java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not avail
     at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:696)
     at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:197)
     at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:100)
+
+java.sql.SANKETSQLERROR: HikariPool-1 - Connection is not available, request timed out after 5000ms
+    at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:696)
+    at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:197)
+    at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:100)
 2026-10-15 10:15:14.032 ERROR [http-nio-8080-exec-7] c.a.i.exception.GlobalExceptionHandler - Returning HTTP 500 path=/api/orders/78126 correlationId=cb20f883 errorCode=ORDER_LOOKUP_FAILED
 2026-10-15 10:15:14.039 INFO  [http-nio-8080-exec-7] c.a.i.metrics.RequestMetrics - Request completed method=GET path=/api/orders/78126 status=500 durationMs=5025 correlationId=cb20f883
 2026-10-15 10:15:18.442 WARN  [http-nio-8080-exec-3] c.a.i.service.OrderService - Elevated request latency endpoint=/api/orders p95Ms=4200 thresholdMs=1000 windowSeconds=60
