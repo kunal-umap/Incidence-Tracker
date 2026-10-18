@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Operation Investigator</title>
+<style>
+:root{color-scheme:dark;--bg:#080c16;--surface:#111a2b;--surface2:#151f34;--line:#283650;--text:#f3f6ff;--muted:#9baac4;--blue:#91aaff;--purple:#c0a4ff;--teal:#70e5c4;--red:#ff9aa9;--amber:#ffd28a}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 10% 0%,#24366a55,transparent 32%),radial-gradient(ellipse at 100% 0%,#482b6650,transparent 30%),var(--bg)}
+button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+.app{min-height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr)}.sidebar{position:sticky;top:0;height:100vh;padding:24px 16px;border-right:1px solid #ffffff12;background:#080e1bd9;backdrop-filter:blur(18px);display:flex;flex-direction:column;gap:26px;z-index:5}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px}.logo{width:43px;height:43px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(140deg,#a7c6ff,#c0a0ff 60%,#75e7e1);color:#101529;font-weight:950;font-size:17px;box-shadow:0 8px 28px #809bff35}.brand-title{font-size:14px;font-weight:800;line-height:1.25}.brand-sub{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.7px;text-transform:uppercase}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#6f809f;font-weight:800;padding:0 12px;margin-bottom:7px}.nav{display:grid;gap:6px}.nav button{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:12px;border:1px solid transparent;border-radius:12px;background:transparent;color:#9cabc5;font-weight:650;transition:.18s}.nav button .nav-ico{width:23px;text-align:center;font-size:16px}.nav button:hover{background:#172239;color:#eef3ff}.nav button.active{background:linear-gradient(110deg,#293d69a8,#382b58a3);border-color:#7188c43b;color:#f6f7ff;box-shadow:inset 3px 0 #9db4ff}.side-bottom{margin-top:auto}.side-note{border:1px solid #2b3b56;background:linear-gradient(145deg,#142139,#101727);border-radius:15px;padding:14px}.side-note strong{font-size:12px}.side-note p{font-size:11px;color:var(--muted);margin:6px 0 0}.connection{display:flex;align-items:center;gap:8px;color:#9cebd2;font-size:11px;margin-top:14px;padding:0 7px}.dot{width:7px;height:7px;border-radius:50%;background:#65e3bc;box-shadow:0 0 0 4px #65e3bc18}
+.main{min-width:0;padding:28px clamp(18px,3vw,42px) 42px;max-width:1600px;width:100%;margin:0 auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}.crumb{color:#9aa9c3;font-size:12px}.topbar h1{margin:3px 0 0;font-size:clamp(23px,2.5vw,30px);letter-spacing:-.8px}.top-actions{display:flex;align-items:center;gap:9px}.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid #35496b;background:#17243b;border-radius:999px;padding:7px 10px;font-size:11px;color:#c9d5f1;white-space:nowrap}.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1.7px;color:#aabaff;font-weight:850}.view{display:none;animation:fadein .22s ease}.view.active{display:block}@keyframes fadein{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.panel{border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#141f33ed,#0f1727f5);box-shadow:0 18px 55px #0000001c}.hero{padding:clamp(22px,3vw,34px);position:relative;overflow:hidden;background:radial-gradient(ellipse at 88% 0%,#6653b638,transparent 34%),radial-gradient(ellipse at 0% 100%,#167d8e22,transparent 38%),linear-gradient(125deg,#162541,#151a30 70%,#211a3c)}.hero:after{content:"";position:absolute;width:250px;height:250px;border:1px solid #a6baff23;border-radius:50%;right:8%;top:-175px;box-shadow:0 0 0 28px #a6baff08,0 0 0 60px #a6baff05;pointer-events:none}.hero h2{font-size:clamp(25px,3vw,36px);letter-spacing:-1px;line-height:1.16;max-width:700px;margin:9px 0 12px}.hero p{max-width:700px;color:#aab7d0;margin:0;line-height:1.75}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.btn{border:1px solid transparent;border-radius:11px;padding:11px 15px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,border-color .15s,background .15s}.btn:hover{transform:translateY(-1px)}.btn-primary{color:#0b1222;background:linear-gradient(130deg,#a1bdff,#c1a3ff)}.btn-secondary{color:#dce5fa;background:#202e47;border-color:#344664}.btn-ghost{color:#cad5eb;background:#ffffff08;border-color:#ffffff18}.btn-danger{color:#ffbac4;background:#421e2a;border-color:#6d3547}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:16px 0 26px}.stat{padding:18px}.stat-top{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:11px}.stat-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:#263553;color:#c6d4ff}.stat-value{font-size:24px;font-weight:850;letter-spacing:-.7px;margin-top:12px}.stat-caption{color:#7f90ad;font-size:11px;margin-top:3px}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 13px}.section-heading h2{font-size:17px;margin:0;letter-spacing:-.3px}.section-heading p{font-size:12px;color:var(--muted);margin:4px 0 0}.feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.feature{padding:18px}.feature-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#243453;color:#b9caff;font-size:17px;margin-bottom:14px}.feature h3{font-size:13px;margin:0 0 7px}.feature p{color:var(--muted);font-size:12px;margin:0;line-height:1.7}
+.form-panel{padding:clamp(18px,2.5vw,28px)}.intro{font-size:12px;color:var(--muted);margin:5px 0 22px}.field-label{display:block;font-size:12px;font-weight:750;color:#d3def2;margin-bottom:8px}.textarea{width:100%;min-height:145px;resize:vertical;padding:14px 15px;border-radius:13px;border:1px solid #354664;background:#0a1221;color:var(--text);outline:none;line-height:1.65}.textarea:focus{border-color:#8ea8ff;box-shadow:0 0 0 3px #8ea8ff20}.count{text-align:right;color:#7f90ad;font-size:10px;margin-top:6px}.examples{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 0 18px}.examples-label{font-size:11px;color:#8494b0}.chip{border:1px solid #344665;background:#192740;color:#c8d5ef;border-radius:999px;padding:7px 10px;font-size:10px;font-weight:700}.chip:hover{border-color:#8da6ff;color:white}.form-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.muted{color:var(--muted);font-size:11px}.status{display:none;margin-top:14px;padding:11px 13px;border-radius:11px;font-size:12px}.status.show{display:block}.status.info{background:#192b4b;border:1px solid #344d79;color:#d0ddff}.status.success{background:#10322d;border:1px solid #2c6c5d;color:#a8f0d8}.status.error{background:#351c2a;border:1px solid #754052;color:#ffc0c8}
+/* Visible investigation-in-progress panel */
+.progress-panel{display:none;margin-top:18px;padding:18px;border:1px solid #465b88;border-radius:16px;background:linear-gradient(120deg,#152746,#1a1b38);box-shadow:0 12px 35px #0002}
+.progress-panel.show{display:block;animation:fadein .2s ease}
+.progress-head{display:flex;align-items:center;gap:12px}
+.progress-spinner{width:32px;height:32px;border:3px solid #6578a755;border-top-color:#a9bdff;border-right-color:#c3a4ff;border-radius:50%;animation:spin .85s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-title{font-size:14px;font-weight:850;color:#f2f5ff}
+.progress-detail{font-size:12px;color:#b3c1dc;margin-top:3px}
+.progress-track{height:6px;border-radius:99px;overflow:hidden;background:#0a1221;margin-top:16px}
+.progress-bar{height:100%;width:35%;border-radius:99px;background:linear-gradient(90deg,#8eafff,#c1a1ff,#70e5c4);animation:indeterminate 1.5s ease-in-out infinite}
+@keyframes indeterminate{0%{transform:translateX(-110%)}50%{transform:translateX(90%)}100%{transform:translateX(290%)}}
+.progress-note{font-size:10px;color:#8fa1c2;margin-top:10px}
+@media(prefers-reduced-motion:reduce){.progress-spinner,.progress-bar{animation:none}.progress-bar{width:100%}}
+
+/* Blocking investigation popup shown while the API request is running */
+.processing-backdrop{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(3,7,18,.82);backdrop-filter:blur(9px)}
+.processing-backdrop.show{display:flex;animation:fadein .18s ease}
+.processing-modal{width:min(440px,100%);padding:30px 26px;border:1px solid #526995;border-radius:24px;text-align:center;background:radial-gradient(ellipse at 50% 0%,#596bb844,transparent 48%),linear-gradient(150deg,#172640,#0b1221);box-shadow:0 30px 100px #000b}
+.processing-spinner{width:64px;height:64px;border:4px solid #6679a544;border-top-color:#a9bdff;border-right-color:#c2a4ff;border-radius:50%;margin:0 auto 20px;animation:spin .85s linear infinite;box-shadow:0 0 0 9px #9bb4ff0b}
+.processing-modal h2{font-size:23px;letter-spacing:-.6px;margin:0 0 9px}
+.processing-modal p{font-size:13px;line-height:1.7;color:#b2c0d9;margin:0}
+.processing-stage{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;color:#cbd8f4;font-size:11px}
+.processing-stage .dot{background:#a9bdff;box-shadow:0 0 0 4px #a9bdff18}
+.processing-track{height:6px;border-radius:99px;overflow:hidden;background:#080f1d;margin-top:20px}
+.processing-track span{display:block;height:100%;width:38%;border-radius:99px;background:linear-gradient(90deg,#8eafff,#c1a1ff,#70e5c4);animation:indeterminate 1.5s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.processing-spinner,.processing-track span{animation:none}.processing-track span{width:100%}}
+
+.report-hero{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:25px;margin-bottom:15px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 88% 0%,#6653b638,transparent 35%),linear-gradient(125deg,#15233c,#15192d 70%,#211a3c)}.report-title{display:flex;align-items:center;gap:15px;min-width:0}.report-icon{width:53px;height:53px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(145deg,#5478c7,#7155a8);border:1px solid #91a5ef77;box-shadow:0 10px 25px #6175d02b;font-size:22px;flex-shrink:0}.report-title h2{font-size:clamp(21px,2.4vw,28px);letter-spacing:-.8px;margin:4px 0}.report-title p{color:var(--muted);font-size:12px;margin:0}.report-actions{display:flex;gap:8px;flex-wrap:wrap}.report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.result-card{padding:20px;min-width:0}.result-card.wide{grid-column:1/-1}.card-heading{display:flex;align-items:center;gap:9px;margin-bottom:12px}.card-heading .ico{width:31px;height:31px;border-radius:10px;background:#263653;color:#c7d4ff;display:grid;place-items:center}.card-heading h3{font-size:13px;margin:0}.card-content{font-size:12px;line-height:1.8;color:#dce5f7;overflow-wrap:anywhere;white-space:pre-wrap}.empty{color:#8494b0}.evidence{border:1px solid #2c3c58;background:#0d1626;border-radius:12px;padding:13px;margin-top:9px}.evidence:before{content:"OBSERVED EVIDENCE";display:block;font-size:9px;letter-spacing:1px;font-weight:850;color:#7de1c3;margin-bottom:6px}.evidence strong{display:block;font-size:12px;font-weight:650}.evidence small{display:block;color:#9babc5;margin-top:5px;overflow-wrap:anywhere}.suggestions{padding-left:18px;margin:0}.suggestions li{margin:7px 0}.similar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.similar-card{border:1px solid #33435e;background:#0e1728;border-radius:13px;padding:15px}.similar-card h4{margin:0 0 8px;font-size:13px}.similar-date{display:inline-block;border:1px solid #344b75;background:#1a2946;border-radius:999px;padding:3px 8px;color:#c6d4ff;font-size:10px;margin-bottom:8px}.similar-label{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#93a3be;font-weight:800;margin:10px 0 3px}.similar-text{font-size:12px;line-height:1.7;overflow-wrap:anywhere}.raw{margin-top:14px;overflow:hidden}.raw summary{padding:15px 18px;cursor:pointer;font-size:12px;font-weight:750;color:#cbd7ef}.raw pre{padding:17px;overflow:auto;max-height:430px;border-top:1px solid var(--line);background:#080f1c;color:#b7cdfb;font:11px/1.7 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.history-list{display:grid;gap:11px}.history-item{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px}.history-main{min-width:0}.history-main strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-main small{display:block;color:var(--muted);font-size:10px;margin-top:5px}.history-actions{display:flex;gap:8px;flex-shrink:0}.empty-state{text-align:center;padding:46px 20px}.empty-state .big-icon{font-size:30px;margin-bottom:10px}.empty-state h3{margin:0 0 5px;font-size:15px}.empty-state p{color:var(--muted);font-size:12px;margin:0 0 17px}
+.footer{text-align:center;color:#72829e;font-size:10px;margin:32px 0 0}
+.modal-backdrop{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:20px;background:#02050bc9;backdrop-filter:blur(10px)}.modal-backdrop.show{display:flex;animation:fadein .2s ease}.modal{width:min(460px,100%);border:1px solid #4a6488;border-radius:23px;padding:28px;background:radial-gradient(ellipse at 50% 0%,#3e4d8755,transparent 45%),linear-gradient(150deg,#17243b,#0e1626);box-shadow:0 35px 100px #0009;text-align:center;position:relative}.success-mark{width:70px;height:70px;border-radius:22px;display:grid;place-items:center;margin:0 auto 17px;font-size:30px;color:#aaf2d8;background:linear-gradient(145deg,#164e46,#193b48);border:1px solid #3d927c;box-shadow:0 0 0 9px #6ce3be0d,0 12px 35px #35c99b19}.modal h2{font-size:24px;letter-spacing:-.7px;margin:0 0 9px}.modal p{font-size:13px;color:#aebbd2;line-height:1.7;margin:0}.modal-meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:17px 0 22px}.modal-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}.modal-close{position:absolute;right:13px;top:13px;border:0;background:#ffffff0b;color:#9eacc4;border-radius:9px;width:31px;height:31px;font-size:17px}
+.toast{position:fixed;right:22px;bottom:22px;z-index:40;display:none;max-width:min(380px,calc(100% - 44px));padding:12px 15px;border:1px solid #3d6d65;background:#102d2a;color:#b5f4df;border-radius:13px;box-shadow:0 15px 45px #0006;font-size:12px}.toast.show{display:block;animation:fadein .2s ease}
+.mobile-menu{display:none}
+@media(max-width:980px){.app{grid-template-columns:210px minmax(0,1fr)}.sidebar{padding:20px 11px}.main{padding:24px 20px}.feature-grid{grid-template-columns:1fr 1fr}.feature:last-child{grid-column:1/-1}}
+@media(max-width:720px){.app{display:block}.sidebar{position:sticky;top:0;height:auto;padding:10px 12px;border-right:0;border-bottom:1px solid #ffffff15;gap:10px;display:block}.brand{padding:0 4px}.logo{width:36px;height:36px;border-radius:11px;font-size:14px}.brand-title{font-size:12px}.brand-sub{font-size:9px}.sidebar .nav-label,.side-bottom{display:none}.nav{display:flex;gap:5px;overflow-x:auto;margin-top:10px;padding-bottom:2px}.nav button{width:auto;white-space:nowrap;padding:8px 10px;font-size:11px;flex-shrink:0}.nav button .nav-ico{width:auto}.main{padding:20px 13px 30px}.topbar{margin-bottom:19px;align-items:flex-start}.topbar h1{font-size:23px}.top-actions .pill{display:none}.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:1/-1}.feature-grid{grid-template-columns:1fr}.feature:last-child{grid-column:auto}.report-hero{align-items:flex-start;flex-direction:column;padding:19px}.report-actions{width:100%}.report-actions .btn{flex:1}.report-grid{grid-template-columns:1fr}.result-card.wide{grid-column:auto}.history-item{align-items:flex-start;flex-direction:column}.history-actions{width:100%}.history-actions .btn{flex:1}.hero h2{font-size:27px}.hero{padding:22px}.form-panel{padding:17px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">AI</div><div><div class="brand-title">AI Operation<br>Investigator</div><div class="brand-sub">Incident intelligence</div></div></div>
+    <div><div class="nav-label">Workspace</div><nav class="nav" aria-label="Main navigation">
+      <button class="active" data-view="dashboard"><span class="nav-ico">⌂</span>Dashboard</button>
+      <button data-view="new"><span class="nav-ico">＋</span>New investigation</button>
+      <button data-view="report"><span class="nav-ico">▤</span>Investigation report</button>
+      <button data-view="history"><span class="nav-ico">◷</span>History</button>
+    </nav></div>
+    <div class="side-bottom"><div class="side-note"><strong>Evidence before conclusions</strong><p>Findings are grounded in returned tool data. Suggestions are not confirmed root causes unless evidence establishes them.</p></div><div class="connection"><span class="dot"></span> Local workspace · API :8080</div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar"><div><div class="crumb" id="breadcrumb">Workspace / Dashboard</div><h1 id="pageTitle">Incident overview</h1></div><div class="top-actions"><span class="pill"><span class="dot"></span> INVESTIGATION WORKSPACE</span></div></div>
+
+    <section class="view active" id="view-dashboard">
+      <div class="panel hero"><div class="eyebrow">Production reliability workspace</div><h2>Turn production signals into clearer next steps.</h2><p>Investigate incidents with an evidence-first workflow. Bring together application symptoms, operational logs, and related incident context—without treating a hypothesis as a confirmed cause.</p><div class="hero-actions"><button class="btn btn-primary" data-go="new">＋ Start an investigation</button><button class="btn btn-secondary" data-go="history">View investigation history →</button></div></div>
+      <div class="stats">
+        <div class="panel stat"><div class="stat-top"><span>Total investigations</span><span class="stat-icon">▤</span></div><div class="stat-value" id="statTotal">0</div><div class="stat-caption">Reports generated in this browser</div></div>
+        <div class="panel stat"><div class="stat-top"><span>Latest report</span><span class="stat-icon">✦</span></div><div class="stat-value" id="statLatest">—</div><div class="stat-caption" id="statLatestNote">No completed investigations yet</div></div>
+        <div class="panel stat"><div class="stat-top"><span>Analysis approach</span><span class="stat-icon">⌕</span></div><div class="stat-value" style="font-size:19px">Evidence-first</div><div class="stat-caption">Observed facts kept distinct from hypotheses</div></div>
+      </div>
+      <div class="section-heading"><div><h2>Investigation workflow</h2><p>From incident description to a structured report.</p></div></div>
+      <div class="feature-grid">
+        <article class="panel feature"><div class="feature-icon">⌕</div><h3>1. Describe the incident</h3><p>Provide the affected service, symptoms, timeframe, and known errors so the investigation has useful context.</p></article>
+        <article class="panel feature"><div class="feature-icon">⌘</div><h3>2. Analyze relevant evidence</h3><p>Use the configured tools to inspect application, database, deployment, or other available data sources.</p></article>
+        <article class="panel feature"><div class="feature-icon">✓</div><h3>3. Review the report</h3><p>Examine the analysis, evidence sources, suggested next steps, and similar incidents returned by the API.</p></article>
+      </div>
+      <div class="section-heading"><div><h2>Recent investigations</h2><p>Your latest locally saved reports.</p></div><button class="btn btn-ghost" data-go="history">View all →</button></div>
+      <div id="dashboardRecent" class="history-list"></div>
+    </section>
+
+    <section class="view" id="view-new">
+      <div class="panel form-panel">
+        <div class="eyebrow">Incident intake</div><div class="section-heading" style="margin-top:5px"><div><h2>Start a new investigation</h2><p>Give the investigator enough context to correlate the right evidence.</p></div><span class="pill">REST API · :8080</span></div>
+        <p class="intro">Include the affected service, what users are seeing, when the incident started, and any error codes or recent changes you know about.</p>
+        <label class="field-label" for="incident">Incident description</label>
+        <textarea class="textarea" id="incident" maxlength="2000" placeholder="Example: The orders API is timing out since 10:15. Users see HTTP 500 errors...">The orders API is experiencing high response times and intermittent timeouts around 10:15 on October 15, 2026.</textarea>
+        <div class="count"><span id="charCount">0</span> / 2000 characters</div>
+        <div class="examples"><span class="examples-label">Try an example:</span><button class="chip" type="button" data-example="The orders API is timing out and returning HTTP 500 errors.">API timeouts</button><button class="chip" type="button" data-example="Database queries are slow and the connection pool appears saturated.">Slow database</button><button class="chip" type="button" data-example="Error rates increased shortly after the latest deployment.">After deployment</button></div>
+        <div class="form-actions"><button id="investigateBtn" class="btn btn-primary" type="button">✦ Investigate incident</button><button id="resetBtn" class="btn btn-secondary" type="button">Reset description</button><span class="muted">The report will open automatically when generation succeeds.</span></div>
+        <div id="requestStatus" class="status" role="status" aria-live="polite"></div>
+        <div id="investigationProgress" class="progress-panel" role="status" aria-live="polite" aria-atomic="true">
+          <div class="progress-head">
+            <div class="progress-spinner" aria-hidden="true"></div>
+            <div><div class="progress-title" id="progressTitle">Investigation in progress</div><div class="progress-detail" id="progressDetail">Sending incident details to the AI investigator…</div></div>
+          </div>
+          <div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
+          <div class="progress-note">Please keep this page open. The report will appear when the backend responds.</div>
+        </div>
+      </div>
+      <div class="section-heading"><div><h2>What happens next?</h2><p>The backend response determines the report content.</p></div></div>
+      <div class="feature-grid"><article class="panel feature"><div class="feature-icon">◌</div><h3>Tool-driven investigation</h3><p>The agent should select relevant tools and analyze their actual results.</p></article><article class="panel feature"><div class="feature-icon">⌗</div><h3>Evidence and sources</h3><p>Review evidence alongside the source returned by the investigation service.</p></article><article class="panel feature"><div class="feature-icon">▤</div><h3>Structured report</h3><p>Issue, analysis, proof, suggestions, and similar incidents are displayed when present.</p></article></div>
+    </section>
+
+    <section class="view" id="view-report">
+      <div class="panel report-hero"><div class="report-title"><div class="report-icon">✦</div><div><div class="eyebrow">Incident intelligence</div><h2>Investigation report</h2><p id="resultSubtitle">Your evidence-backed report will appear here after an investigation.</p></div></div><div class="report-actions"><span id="httpStatus" class="pill" hidden></span><button id="copyJsonBtn" class="btn btn-ghost" type="button">Copy JSON</button><button id="reportNewBtn" class="btn btn-primary" type="button">＋ New investigation</button></div></div>
+      <div id="reportEmpty" class="panel empty-state"><div class="big-icon">▤</div><h3>No report generated yet</h3><p>Start an investigation to see the findings, evidence, and suggestions here.</p><button class="btn btn-primary" data-go="new">Start investigation</button></div>
+      <div id="reportContent" hidden>
+        <div class="report-grid">
+          <article class="panel result-card"><div class="card-heading"><span class="ico">!</span><h3>Issue</h3></div><div id="issue" class="card-content empty">No issue returned yet.</div></article>
+          <article class="panel result-card"><div class="card-heading"><span class="ico">⌕</span><h3>Analysis</h3></div><div id="analysis" class="card-content empty">Analysis will appear here.</div></article>
+          <article class="panel result-card"><div class="card-heading"><span class="ico">✓</span><h3>Evidence &amp; source</h3></div><p class="muted">Signals returned by investigation tools, with source information when available.</p><div id="proof" class="card-content empty">Evidence and source will appear here.</div></article>
+          <article class="panel result-card"><div class="card-heading"><span class="ico">↗</span><h3>Suggestions</h3></div><div id="suggestion" class="card-content empty">Suggested next steps will appear here.</div></article>
+          <article class="panel result-card wide"><div class="card-heading"><span class="ico">◷</span><h3>Status</h3></div><div id="investigationStatus" class="card-content empty">No status returned.</div></article>
+        </div>
+        <div class="section-heading"><div><h2>Similar historical incidents</h2><p>Related incidents returned by the configured investigation workflow.</p></div></div>
+        <div id="similarIncidents" class="similar-grid"></div>
+        <section class="panel raw" style="margin-top:14px"><details><summary>View raw JSON response</summary><pre id="rawJson">No response received yet.</pre></details></section>
+      </div>
+      <p class="footer">Evidence shown here comes from the API response. Suggestions are not a confirmed root cause unless the evidence supports that conclusion.</p>
+    </section>
+
+    <section class="view" id="view-history">
+      <div class="section-heading" style="margin-top:0"><div><h2>Investigation history</h2><p>Reports saved locally in this browser. This is not a shared server-side history.</p></div><button class="btn btn-primary" data-go="new">＋ New investigation</button></div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+    <p class="footer">AI Operation Investigator · Evidence-first incident response</p>
+  </main>
+</div>
+
+<div id="completionModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDescription">
+  <div class="modal"><button class="modal-close" id="modalCloseX" aria-label="Close dialog">×</button><div class="success-mark">✓</div><div class="eyebrow">Investigation complete</div><h2 id="modalTitle">Your report is ready</h2><p id="modalDescription">The investigation finished and the report was generated successfully. Review the evidence and suggested next steps.</p><div class="modal-meta"><span class="pill" id="modalIncidentId">Report generated</span><span class="pill" id="modalTime">Just now</span></div><div class="modal-actions"><button class="btn btn-secondary" id="modalClose" type="button">Stay here</button><button class="btn btn-primary" id="modalViewReport" type="button">View investigation report →</button></div></div>
+</div>
+
+<div id="processingModal" class="processing-backdrop" role="dialog" aria-modal="true" aria-labelledby="processingTitle" aria-describedby="processingDescription">
+  <div class="processing-modal">
+    <div class="processing-spinner" aria-hidden="true"></div>
+    <div class="eyebrow">AI Operation Investigator</div>
+    <h2 id="processingTitle">Investigation in progress</h2>
+    <p id="processingDescription">Your incident has been submitted. The investigator is analyzing the request and preparing your report.</p>
+    <div class="processing-track" aria-hidden="true"><span></span></div>
+    <div class="processing-stage"><span class="dot"></span><span id="processingStageText">Waiting for the investigation service…</span></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+const API_BASE = "/api/v1/incidents/";
+const HISTORY_KEY = "aiOperationInvestigatorHistoryV1";
+const incidentInput = document.getElementById("incident");
+const investigateBtn = document.getElementById("investigateBtn");
+const requestStatus = document.getElementById("requestStatus");
+const investigationProgress = document.getElementById("investigationProgress");
+const progressTitle = document.getElementById("progressTitle");
+const progressDetail = document.getElementById("progressDetail");
+const processingModal = document.getElementById("processingModal");
+const processingStageText = document.getElementById("processingStageText");
+const httpStatus = document.getElementById("httpStatus");
+const charCount = document.getElementById("charCount");
+let latestResponse = null;
+let latestHistoryId = null;
+let toastTimer = null;
+
+const pageInfo = {
+  dashboard: ["Workspace / Dashboard", "Incident overview"],
+  new: ["Workspace / New investigation", "Start an investigation"],
+  report: ["Workspace / Investigation report", "Investigation report"],
+  history: ["Workspace / History", "Investigation history"]
+};
+function navigate(view) {
+  if (!pageInfo[view]) view = "dashboard";
+  document.querySelectorAll(".view").forEach(el => el.classList.toggle("active", el.id === `view-${view}`));
+  document.querySelectorAll("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === view));
+  document.getElementById("breadcrumb").textContent = pageInfo[view][0];
+  document.getElementById("pageTitle").textContent = pageInfo[view][1];
+  if (view === "history") renderHistory();
+  if (view === "dashboard") renderDashboard();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => navigate(btn.dataset.view)));
+document.querySelectorAll("[data-go]").forEach(btn => btn.addEventListener("click", () => navigate(btn.dataset.go)));
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+}
+function setStatus(message, kind = "info") {
+  requestStatus.textContent = message;
+  requestStatus.className = `status show ${kind}`;
+}
+function updateCharCount() { charCount.textContent = incidentInput.value.length; }
+incidentInput.addEventListener("input", updateCharCount);
+updateCharCount();
+document.querySelectorAll("[data-example]").forEach(btn => btn.addEventListener("click", () => {
+  incidentInput.value = btn.dataset.example; updateCharCount(); incidentInput.focus();
+}));
+document.getElementById("resetBtn").addEventListener("click", () => {
+  incidentInput.value = ""; updateCharCount(); incidentInput.focus();
+  requestStatus.className = "status"; requestStatus.textContent = "";
+  investigationProgress.classList.remove("show");
+});
+document.getElementById("reportNewBtn").addEventListener("click", () => navigate("new"));
+
+function getHistory() {
+  try { const value = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); return Array.isArray(value) ? value : []; }
+  catch { return []; }
+}
+function saveHistory(items) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0,30))); }
+  catch { showToast("Report generated, but browser storage is unavailable."); }
+}
+function safeText(value, fallback = "Not provided") {
+  if (value === undefined || value === null || value === "") return fallback;
+  return typeof value === "string" ? value : JSON.stringify(value, null, 2);
+}
+function setText(id, value, fallback) {
+  const el = document.getElementById(id);
+  el.replaceChildren();
+  if (value === undefined || value === null || value === "") {
+    el.textContent = fallback; el.classList.add("empty");
+  } else {
+    el.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+    el.classList.remove("empty");
+  }
+}
+function renderProof(proof) {
+  const container = document.getElementById("proof"); container.replaceChildren();
+  if (!Array.isArray(proof) || proof.length === 0) {
+    container.textContent = "No evidence items returned."; container.className = "card-content empty"; return;
+  }
+  container.className = "card-content";
+  proof.forEach(item => {
+    const card = document.createElement("div"); card.className = "evidence";
+    const evidence = document.createElement("strong"); evidence.textContent = item?.evidence ?? item?.proof ?? "Evidence not specified";
+    const source = document.createElement("small"); source.textContent = `Source: ${item?.source ?? "Not specified"}`;
+    card.append(evidence, source); container.append(card);
+  });
+}
+function renderSuggestions(suggestions) {
+  const container = document.getElementById("suggestion"); container.replaceChildren();
+  if (!Array.isArray(suggestions) || suggestions.length === 0) {
+    container.textContent = suggestions ? String(suggestions) : "No suggestions returned.";
+    container.className = "card-content empty"; return;
+  }
+  container.className = "card-content";
+  const list = document.createElement("ul"); list.className = "suggestions";
+  suggestions.forEach(item => { const li = document.createElement("li"); li.textContent = typeof item === "string" ? item : JSON.stringify(item); list.append(li); });
+  container.append(list);
+}
+function renderSimilarIncidents(incidents) {
+  const container = document.getElementById("similarIncidents"); container.replaceChildren();
+  if (!Array.isArray(incidents) || incidents.length === 0) {
+    const empty = document.createElement("div"); empty.className = "panel result-card empty"; empty.textContent = "No similar incidents returned."; container.append(empty); return;
+  }
+  incidents.forEach((incident, index) => {
+    const card = document.createElement("article"); card.className = "similar-card";
+    const heading = document.createElement("h4"); heading.textContent = `Incident ${index + 1}`; card.append(heading);
+    if (incident?.date) { const date = document.createElement("span"); date.className = "similar-date"; date.textContent = incident.date; card.append(date); }
+    [["Incident",incident?.incident],["Root cause",incident?.rootCause],["Previously implemented solution",incident?.previouslyImplementedSolution]].forEach(([label,value]) => {
+      const l = document.createElement("div"); l.className = "similar-label"; l.textContent = label;
+      const v = document.createElement("div"); v.className = "similar-text"; v.textContent = value || "Not provided"; card.append(l,v);
+    });
+    container.append(card);
+  });
+}
+function renderResponse(data) {
+  latestResponse = data;
+  setText("issue", data?.issue, "No issue returned.");
+  setText("analysis", data?.analysis, "No analysis returned.");
+  renderProof(data?.proof); renderSuggestions(data?.suggestion); renderSimilarIncidents(data?.similarIncidents);
+  setText("investigationStatus", data?.status, "Status was not included in the response.");
+  document.getElementById("rawJson").textContent = JSON.stringify(data,null,2);
+  document.getElementById("resultSubtitle").textContent = "Report generated successfully. Review the evidence and verify suggested next steps.";
+  document.getElementById("reportEmpty").hidden = true;
+  document.getElementById("reportContent").hidden = false;
+}
+function openCompletionModal(record) {
+  document.getElementById("modalIncidentId").textContent = record.id || "Report generated";
+  document.getElementById("modalTime").textContent = new Date(record.createdAt).toLocaleString();
+  document.getElementById("completionModal").classList.add("show");
+  document.getElementById("modalViewReport").focus();
+}
+function closeCompletionModal() {
+  document.getElementById("completionModal").classList.remove("show");
+}
+document.getElementById("modalClose").addEventListener("click", closeCompletionModal);
+document.getElementById("modalCloseX").addEventListener("click", closeCompletionModal);
+document.getElementById("modalViewReport").addEventListener("click", () => { closeCompletionModal(); navigate("report"); });
+document.getElementById("completionModal").addEventListener("click", e => { if (e.target.id === "completionModal") closeCompletionModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeCompletionModal(); });
+
+function makeHistoryItem(record, compact = false) {
+  const item = document.createElement("article"); item.className = "panel history-item";
+  const main = document.createElement("div"); main.className = "history-main";
+  const title = document.createElement("strong"); title.textContent = record.issue || record.description || "Untitled investigation";
+  const time = document.createElement("small"); time.textContent = `${new Date(record.createdAt).toLocaleString()} · ${record.id || "Investigation"}`;
+  main.append(title,time);
+  const actions = document.createElement("div"); actions.className = "history-actions";
+  const view = document.createElement("button"); view.className = "btn btn-secondary"; view.textContent = "View report";
+  view.addEventListener("click", () => { latestResponse = record.response; latestHistoryId = record.id; renderResponse(record.response); navigate("report"); });
+  actions.append(view);
+  if (!compact) {
+    const remove = document.createElement("button"); remove.className = "btn btn-danger"; remove.textContent = "Remove";
+    remove.addEventListener("click", () => { saveHistory(getHistory().filter(x => x.id !== record.id)); renderHistory(); renderDashboard(); showToast("Investigation removed from local history."); });
+    actions.append(remove);
+  }
+  item.append(main,actions); return item;
+}
+function renderHistory() {
+  const container = document.getElementById("historyList"); container.replaceChildren();
+  const items = getHistory();
+  if (!items.length) {
+    const empty = document.createElement("div"); empty.className = "panel empty-state";
+    empty.innerHTML = '<div class="big-icon">◷</div><h3>No saved investigations</h3><p>Completed reports will appear here in this browser.</p><button class="btn btn-primary" data-go="new">Start investigation</button>';
+    empty.querySelector("[data-go]").addEventListener("click", () => navigate("new")); container.append(empty); return;
+  }
+  items.forEach(record => container.append(makeHistoryItem(record)));
+}
+function renderDashboard() {
+  const items = getHistory();
+  document.getElementById("statTotal").textContent = items.length;
+  document.getElementById("statLatest").textContent = items.length ? new Date(items[0].createdAt).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}) : "—";
+  document.getElementById("statLatestNote").textContent = items.length ? new Date(items[0].createdAt).toLocaleDateString() : "No completed investigations yet";
+  const recent = document.getElementById("dashboardRecent"); recent.replaceChildren();
+  if (!items.length) {
+    const empty = document.createElement("div"); empty.className = "panel empty-state";
+    empty.innerHTML = '<div class="big-icon">✦</div><h3>Your workspace is ready</h3><p>Start your first investigation to create a report and populate this dashboard.</p><button class="btn btn-primary" data-go="new">Start investigation</button>';
+    empty.querySelector("[data-go]").addEventListener("click", () => navigate("new")); recent.append(empty); return;
+  }
+  items.slice(0,3).forEach(record => recent.append(makeHistoryItem(record,true)));
+}
+function showReportFromHistory(record) {
+  latestResponse = record.response; latestHistoryId = record.id; renderResponse(record.response); navigate("report");
+}
+document.getElementById("copyJsonBtn").addEventListener("click", async () => {
+  if (!latestResponse) { showToast("Run an investigation first to copy a report."); return; }
+  try { await navigator.clipboard.writeText(JSON.stringify(latestResponse,null,2)); showToast("Report JSON copied to clipboard."); }
+  catch { showToast("Clipboard access is unavailable in this browser context."); }
+});
+
+investigateBtn.addEventListener("click", async () => {
+  const description = incidentInput.value.trim();
+  if (!description) { setStatus("Enter an incident description before starting the investigation.", "error"); incidentInput.focus(); return; }
+  const url = `${API_BASE}?incidentDescription=${encodeURIComponent(description)}`;
+  investigateBtn.disabled = true; investigateBtn.textContent = "◌ Investigating…";
+  setStatus("Investigation is running. Please wait for the report…", "info");
+  investigationProgress.classList.add("show");
+  progressTitle.textContent = "Investigation in progress";
+  progressDetail.textContent = "Your incident has been submitted to the AI investigator.";
+  processingStageText.textContent = "Connecting to the investigation service…";
+  processingModal.classList.add("show");
+  document.getElementById("resultSubtitle").textContent = "Investigation is running…";
+  // Update the visible stage after the request has been sent. This is request-level status, not tool-level telemetry.
+  const stageTimer = setTimeout(() => { processingStageText.textContent = "Analyzing incident and waiting for the report…"; progressDetail.textContent = "The backend is processing your request. This may take a little while."; }, 900);
+  try {
+    const response = await fetch(url,{method:"GET",headers:{"Accept":"application/json"}});
+    const body = await response.text();
+    clearTimeout(stageTimer);
+    processingStageText.textContent = "Response received. Preparing your report…";
+    httpStatus.hidden = false; httpStatus.textContent = `HTTP ${response.status}`;
+    let data;
+    try { data = body ? JSON.parse(body) : {}; }
+    catch { throw new Error(`API returned non-JSON content (HTTP ${response.status}). ${body.slice(0,350)}`); }
+    if (!response.ok) throw new Error(data?.message || data?.error || `Request failed with HTTP ${response.status}.`);
+    renderResponse(data);
+    const record = {
+      id: `INV-${Date.now().toString(36).toUpperCase()}`,
+      createdAt: new Date().toISOString(),
+      description,
+      issue: typeof data?.issue === "string" ? data.issue : description,
+      response: data
+    };
+    latestHistoryId = record.id;
+    const items = getHistory().filter(x => x.id !== record.id);
+    items.unshift(record); saveHistory(items);
+    setStatus("Investigation completed and report generated successfully.", "success");
+    renderDashboard();
+    processingModal.classList.remove("show");
+    investigationProgress.classList.remove("show");
+    openCompletionModal(record);
+  } catch (error) {
+    clearTimeout(stageTimer);
+    processingModal.classList.remove("show");
+    investigationProgress.classList.remove("show");
+    const message = error instanceof TypeError
+      ? "Could not reach the API. Confirm Spring Boot is running on localhost:8080 and CORS allows this page's origin."
+      : error.message;
+    setStatus(message, "error");
+    document.getElementById("resultSubtitle").textContent = "The investigation did not return a usable JSON report.";
+    document.getElementById("rawJson").textContent = String(error.stack || error);
+    showToast("Investigation failed. Check the error message on the New Investigation page.");
+  } finally {
+    investigateBtn.disabled = false; investigateBtn.textContent = "✦ Investigate incident";
+  }
+});
+
+document.getElementById("incident").addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") investigateBtn.click();
+});
+renderDashboard();
+renderHistory();
+</script>
+</body>
+</html>
