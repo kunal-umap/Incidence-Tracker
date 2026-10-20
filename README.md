@@ -306,7 +306,7 @@ locations relevant to building and running the application:
         └── resources/
             ├── application.properties
             ├── static/        # Frontend assets, if stored in the Spring Boot static directory
-            └── logs/          # Log files included by the current Docker build, if present
+            └── logs/          # Log files 
 ```
 
 Treat this as a high-level guide, not a guaranteed exhaustive listing of
@@ -349,11 +349,7 @@ Contributions are welcome. For a change:
 4.  Describe the change and any configuration requirements in your pull
     request.
 
-## License
 
-No license information was confirmed for this repository. Add a
-`LICENSE` file and update this section if you intend to distribute the
-project under a specific license.
 
 ------------------------------------------------------------------------
 
